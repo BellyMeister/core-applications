@@ -23,8 +23,18 @@ namespace Model
 
     public enum RoleEnum
     {
-        Manager,
-        Employee,
-        Customer
+        Customer = 1,
+        Employee = 2,
+        Manager = 3
+    }
+
+    class EnumGuid : Attribute
+    {
+        public Guid Guid;
+
+        public EnumGuid(string guid)
+        {
+            Guid = new Guid(guid);
+        }
     }
 }

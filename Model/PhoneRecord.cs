@@ -13,9 +13,7 @@ namespace Model
         public Guid Id { get; set; }
         public DateTime CallStart { get; set; }
         public DateTime CallEnd { get; set; }
-        public string CallerLandCode { get; set; }
-        public string CallerPhoneNumber { get; set; }
-        public string RecieverLandCode { get; set; }
-        public string RecieverPhoneNumber { get; set; }
+        public Guid CallerId { get; set; }
+        public Guid RecieverId { get; set; }
     }
 }
