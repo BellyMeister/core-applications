@@ -3,7 +3,6 @@ using Model;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text;
 
 namespace MSSQL
 {
@@ -19,19 +18,19 @@ namespace MSSQL
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 return null;
                 throw;
             }
         }
-        public bool CreateUser(User sender, string name, string email, string password, int role, string phoneNumber = null, string landCode = null)
+        public bool CreateUser(User sender, User userToAdd)
         {
             if (sender.Role == RoleEnum.Customer) return false;
 
             SqlConnection conn = OpenConnection();
-            string command = "INSERT INTO Users(FullName, Email, PWord, UserRole, LandCode, PhoneNumber) " +
-                $"VALUES ('{name}', '{email}', '{password}', '{role}', '{landCode}', '{phoneNumber}')";
+            string command = "INSERT INTO Users(Id, FullName, Email, PWord, UserRole, LandCode, PhoneNumber) " +
+                $"VALUES ('{Guid.NewGuid()}', '{userToAdd.Name}', '{userToAdd.Email}', '{userToAdd.Password}', '{(int)userToAdd.Role}', '{userToAdd.LandCode}', '{userToAdd.Number}')";
             int result = new SqlCommand(command, conn).ExecuteNonQuery();
-
             conn.Close();
 
             if (result != 0) return true;
@@ -94,8 +93,10 @@ namespace MSSQL
                         Records = new List<PhoneRecord>()
                     };
                     user.Records = GetPhoneRecords(user, user);
+                    conn.Close();
                     return user;
                 }
+                conn.Close();
                 return null;
             }
         }
@@ -109,8 +110,44 @@ namespace MSSQL
             string command = $"UPDATE Users SET UserRole = '{newRole}' WHERE Id = '{userToUpdate.Id}'";
 
             if (new SqlCommand(command, conn).ExecuteNonQuery() != 0)
+            {
+                conn.Close();
                 return true;
+            }
+            conn.Close();
             return false;
+        }
+
+        public string GenerateNumber()
+        {
+            Random rnd = new Random();
+
+            string number = $"{rnd.Next(10000000, 9999999)}";
+            while (!ValidateNumber(number))
+            {
+                number = $"{rnd.Next(10000000, 9999999)}";
+            }
+            return number;
+        }
+
+        public bool ValidateNumber(string number)
+        {
+            if (number.Length < 8 || number.Length > 10)
+                return false;
+            
+            SqlConnection conn = OpenConnection();
+            string command = $"SELECT * FROM Users WHERE PhoneNumber = '{number}'";
+
+            using (var reader = new SqlCommand(command, conn).ExecuteReader())
+            {
+                if (reader.HasRows)
+                {
+                    conn.Close();
+                    return false;
+                }
+            }
+            conn.Close();
+            return true;
         }
     }
 }

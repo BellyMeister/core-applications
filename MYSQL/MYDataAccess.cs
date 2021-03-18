@@ -19,17 +19,18 @@ namespace MYSQL
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 return null;
                 throw;
             }
         }
-        public bool CreateUser(User sender, string name, string email, string password, int role, string phoneNumber = null, string landCode = null)
+        public bool CreateUser(User sender, User userToAdd)
         {
             if (sender.Role == RoleEnum.Customer) return false;
 
             MySqlConnection conn = OpenConnection();
             string command = "INSERT INTO Users(Id, FullName, Email, PWord, UserRole, LandCode, PhoneNumber) " +
-                $"VALUES ('{Guid.NewGuid()}', '{name}', '{email}', '{password}', '{role}', '{landCode}', '{phoneNumber}')";
+                $"VALUES ('{Guid.NewGuid()}', '{userToAdd.Name}', '{userToAdd.Email}', '{userToAdd.Password}', '{(int)userToAdd.Role}', '{userToAdd.LandCode}', '{userToAdd.Number}')";
             int result = new MySqlCommand(command, conn).ExecuteNonQuery();
             conn.Close();
 
@@ -87,8 +88,10 @@ namespace MYSQL
                         Records = new List<PhoneRecord>()
                     };
                     user.Records = GetPhoneRecords(user, user);
+                    conn.Close();
                     return user;
                 }
+                conn.Close();
                 return null;
             }
         }
@@ -104,6 +107,38 @@ namespace MYSQL
             if (new MySqlCommand(command, conn).ExecuteNonQuery() != 0)
                 return true;
             return false;
+        }
+
+        public string GenerateNumber()
+        {
+            Random rnd = new Random();
+
+            string number = $"{rnd.Next(10000000, 9999999)}";
+            while (!ValidateNumber(number))
+            {
+                number = $"{rnd.Next(10000000, 9999999)}";
+            }
+            return number;
+        }
+
+        public bool ValidateNumber(string number)
+        {
+            if (number.Length < 8 || number.Length > 10)
+                return false;
+
+            MySqlConnection conn = OpenConnection();
+            string command = $"SELECT * FROM Users WHERE PhoneNumber = '{number}'";
+
+            using (var reader = new MySqlCommand(command, conn).ExecuteReader())
+            {
+                if (reader.HasRows)
+                {
+                    conn.Close();
+                    return false;
+                }
+            }
+            conn.Close();
+            return true;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace Model
 {
@@ -12,11 +11,20 @@ namespace Model
             Id = Guid.NewGuid();
         }
         public Guid Id { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
+        [EmailAddress]
         public string Email { get; set; }
+        [Required]
         public string Password { get; set; }
+        [Required]
         public RoleEnum Role { get; set; }
+        [Required]
+        [StringLength(maximumLength: 3, MinimumLength = 2)]
         public string LandCode { get; set; }
+        [Required]
+        [StringLength(maximumLength: 10, MinimumLength = 8)]
         public string Number { get; set; }
         public List<PhoneRecord> Records { get; set; }
     }
@@ -26,15 +34,5 @@ namespace Model
         Customer = 1,
         Employee = 2,
         Manager = 3
-    }
-
-    class EnumGuid : Attribute
-    {
-        public Guid Guid;
-
-        public EnumGuid(string guid)
-        {
-            Guid = new Guid(guid);
-        }
     }
 }

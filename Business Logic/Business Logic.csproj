@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Business_Logic</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,9 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Business Logic\Business Logic.csproj" />
     <ProjectReference Include="..\Interface\Interfaces.csproj" />
-    <ProjectReference Include="..\Model\Model.csproj" />
     <ProjectReference Include="..\MYSQL\MYSQL.csproj" />
     <ProjectReference Include="..\SQL\MSSQL.csproj" />
   </ItemGroup>
