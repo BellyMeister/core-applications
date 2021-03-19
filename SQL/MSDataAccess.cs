@@ -42,8 +42,8 @@ namespace MSSQL
             List<PhoneRecord> output = new List<PhoneRecord>();
             if (sender.Role == RoleEnum.Customer && sender != user) return new List<PhoneRecord>();
             SqlConnection conn = OpenConnection();
-            string command = $"SELECT * FROM PhoneRecords WHERE CallerID = '{user.Id}' OR RecieverId = '{user.Id}'";
-
+            //string command = $"SELECT * FROM PhoneRecords WHERE CallerID = '{user.Id}' OR RecieverId = '{user.Id}'";
+            string command = $"SELECT *, (SELECT FullName FROM Users WHERE Id = pr.CallerId) AS CallerName,  (SELECT FullName FROM Users WHERE Id = pr.RecieverId) as RecieverName FROM PhoneRecords pr WHERE CallerId like '{user.Id}' OR RecieverID like '{user.Id}'";
             if (sinceDate != null)
                 command += $" AND CallStart >= '{sinceDate}'";
 
@@ -57,7 +57,9 @@ namespace MSSQL
                         CallStart = DateTime.Parse(reader["CallStart"].ToString()),
                         CallEnd = DateTime.Parse(reader["CallEnd"].ToString()),
                         CallerId = Guid.Parse(reader["CallerId"].ToString()),
+                        CallerName = reader["CallerName"].ToString(),
                         RecieverId = Guid.Parse(reader["RecieverId"].ToString()),
+                        RecieverName = reader["RecieverName"].ToString(),
                     });
                 }
             }
@@ -148,6 +150,11 @@ namespace MSSQL
             }
             conn.Close();
             return true;
+        }
+
+        public User GetUser(Guid id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

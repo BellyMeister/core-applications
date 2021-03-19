@@ -44,14 +44,14 @@ namespace Presentation
 
             // LOGIN
             var loggedInUser = bloc.Login("test", "Hej");
-            Console.WriteLine(loggedInUser == null ? "Login failed" : "Login Success");
+            Console.WriteLine(loggedInUser == null ? $"" : "Login Success");
             
             // GET PHONE RECORDS
             List<PhoneRecord> records = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PhoneRecord>>(bloc.GetPhoneRecords(localUser, loggedInUser));
 
             foreach (var record in records)
             {
-                Console.WriteLine(record.Id);
+                Console.WriteLine("----------------------------- \n" + record.ToString());
             }
 
             
